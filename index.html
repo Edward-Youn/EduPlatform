@@ -1,889 +1,760 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>수강신청 시스템</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #f9fafb;
-            color: #111827;
-            line-height: 1.6;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 16px;
-        }
-
-        /* Header */
-        .header {
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
-            color: white;
-            padding: 20px 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .header h1 {
-            font-size: 28px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .icon {
-            width: 24px;
-            height: 24px;
-            fill: currentColor;
-        }
-
-        /* Status Cards */
-        .status-section {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            margin: 24px 0;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        .status-section h2 {
-            font-size: 20px;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .status-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-        }
-
-        .status-card {
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .status-card.blue {
-            background: #dbeafe;
-            color: #1e40af;
-        }
-
-        .status-card.green {
-            background: #dcfce7;
-            color: #15803d;
-        }
-
-        .status-card.purple {
-            background: #f3e8ff;
-            color: #7c3aed;
-        }
-
-        .status-card .number {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .status-card .label {
-            font-size: 14px;
-            opacity: 0.8;
-        }
-
-        /* Main Content */
-        .main-content {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 24px;
-            margin-bottom: 24px;
-        }
-
-        .course-section {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        .section-title {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* Search and Filter */
-        .search-filter {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .search-input {
-            position: relative;
-        }
-
-        .search-input input {
-            width: 100%;
-            padding: 12px 12px 12px 40px;
-            border: 2px solid #e5e7eb;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.2s;
-        }
-
-        .search-input input:focus {
-            outline: none;
-            border-color: #2563eb;
-        }
-
-        .search-input svg {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #6b7280;
-        }
-
-        .filter-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .filter-row select {
-            padding: 8px 12px;
-            border: 2px solid #e5e7eb;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-
-        /* Course List */
-        .course-list {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .course-item {
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 16px;
-            transition: all 0.2s;
-        }
-
-        .course-item:hover {
-            background: #f9fafb;
-        }
-
-        .course-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 12px;
-        }
-
-        .course-info {
-            flex: 1;
-        }
-
-        .course-badges {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
-        }
-
-        .badge {
-            background: #dbeafe;
-            color: #1e40af;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .department-tag {
-            background: #f3f4f6;
-            color: #6b7280;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 11px;
-        }
-
-        .course-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .course-details {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-            font-size: 14px;
-            color: #6b7280;
-            margin-bottom: 8px;
-        }
-
-        .course-capacity {
-            font-size: 14px;
-            color: #6b7280;
-            margin-bottom: 8px;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background: #e5e7eb;
-            border-radius: 3px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: #2563eb;
-            transition: width 0.3s ease;
-        }
-
-        .course-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .btn-primary {
-            background: #2563eb;
-            color: white;
-        }
-
-        .btn-primary:hover:not(:disabled) {
-            background: #1d4ed8;
-        }
-
-        .btn-secondary {
-            background: #f3f4f6;
-            color: #374151;
-        }
-
-        .btn-secondary:hover {
-            background: #e5e7eb;
-        }
-
-        .btn:disabled {
-            background: #d1d5db;
-            color: #9ca3af;
-            cursor: not-allowed;
-        }
-
-        /* Registered Courses */
-        .registered-courses {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            height: fit-content;
-        }
-
-        .registered-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .registered-item {
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 12px;
-            position: relative;
-        }
-
-        .registered-item .remove-btn {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: none;
-            border: none;
-            color: #ef4444;
-            cursor: pointer;
-            padding: 4px;
-            border-radius: 4px;
-        }
-
-        .registered-item .remove-btn:hover {
-            background: #fee2e2;
-        }
-
-        .registered-item h4 {
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 8px;
-        }
-
-        .registered-item .details {
-            font-size: 12px;
-            color: #6b7280;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .empty-state {
-            text-align: center;
-            color: #6b7280;
-            padding: 40px 20px;
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-        }
-
-        .modal.active {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 12px;
-            max-width: 600px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-            padding: 24px;
-            position: relative;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 20px;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #6b7280;
-        }
-
-        .modal-info {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-
-        .info-item {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .info-label {
-            font-size: 14px;
-            font-weight: 500;
-            color: #6b7280;
-            margin-bottom: 4px;
-        }
-
-        .info-value {
-            font-size: 16px;
-            color: #111827;
-        }
-
-        .modal-description {
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid #e5e7eb;
-        }
-
-        .modal-actions {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #e5e7eb;
-        }
-
-        .modal-actions .btn {
-            width: 100%;
-            padding: 12px;
-            justify-content: center;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
+import React, { useState, useEffect } from 'react';
+import { Search, Clock, User, MapPin, Users, BookOpen, AlertCircle, CheckCircle, Calendar, Grid3X3, ChevronLeft, ChevronRight } from 'lucide-react';
+
+const CourseRegistrationApp = () => {
+  const [activeTab, setActiveTab] = useState('search');
+  const [currentDate, setCurrentDate] = useState(new Date());
+  
+  const [courses] = useState([
+    {
+      id: 1,
+      name: "자료구조",
+      professor: "김교수",
+      times: [
+        { day: "월", startTime: "09:00", endTime: "10:30" },
+        { day: "수", startTime: "09:00", endTime: "10:30" }
+      ],
+      credit: 3,
+      capacity: 30,
+      enrolled: 25,
+      room: "공학관 101",
+      department: "컴퓨터공학과",
+      color: "bg-blue-500"
+    },
+    {
+      id: 2,
+      name: "운영체제",
+      professor: "박교수",
+      times: [
+        { day: "화", startTime: "14:00", endTime: "15:30" },
+        { day: "목", startTime: "14:00", endTime: "15:30" }
+      ],
+      credit: 3,
+      capacity: 25,
+      enrolled: 20,
+      room: "공학관 201",
+      department: "컴퓨터공학과",
+      color: "bg-blue-600"
+    },
+    {
+      id: 3,
+      name: "데이터베이스",
+      professor: "이교수",
+      times: [
+        { day: "월", startTime: "11:00", endTime: "12:30" },
+        { day: "금", startTime: "11:00", endTime: "12:30" }
+      ],
+      credit: 3,
+      capacity: 35,
+      enrolled: 30,
+      room: "공학관 301",
+      department: "컴퓨터공학과",
+      color: "bg-blue-700"
+    },
+    {
+      id: 4,
+      name: "알고리즘",
+      professor: "최교수",
+      times: [
+        { day: "화", startTime: "09:00", endTime: "10:30" },
+        { day: "목", startTime: "09:00", endTime: "10:30" }
+      ],
+      credit: 3,
+      capacity: 30,
+      enrolled: 28,
+      room: "공학관 401",
+      department: "컴퓨터공학과",
+      color: "bg-blue-800"
+    },
+    {
+      id: 5,
+      name: "네트워크",
+      professor: "정교수",
+      times: [
+        { day: "수", startTime: "14:00", endTime: "15:30" },
+        { day: "금", startTime: "14:00", endTime: "15:30" }
+      ],
+      credit: 3,
+      capacity: 25,
+      enrolled: 22,
+      room: "공학관 501",
+      department: "컴퓨터공학과",
+      color: "bg-indigo-500"
+    },
+    {
+      id: 6,
+      name: "소프트웨어공학",
+      professor: "송교수",
+      times: [
+        { day: "월", startTime: "14:00", endTime: "17:00" }
+      ],
+      credit: 3,
+      capacity: 20,
+      enrolled: 15,
+      room: "공학관 601",
+      department: "컴퓨터공학과",
+      color: "bg-indigo-600"
+    },
+    {
+      id: 7,
+      name: "미적분학",
+      professor: "한교수",
+      times: [
+        { day: "화", startTime: "11:00", endTime: "12:30" },
+        { day: "목", startTime: "11:00", endTime: "12:30" }
+      ],
+      credit: 3,
+      capacity: 40,
+      enrolled: 35,
+      room: "수학관 101",
+      department: "수학과",
+      color: "bg-green-500"
+    },
+    {
+      id: 8,
+      name: "영어회화",
+      professor: "Smith",
+      times: [
+        { day: "수", startTime: "16:00", endTime: "17:30" }
+      ],
+      credit: 2,
+      capacity: 15,
+      enrolled: 12,
+      room: "어학관 201",
+      department: "영어과",
+      color: "bg-purple-500"
+    }
+  ]);
+
+  const [registeredCourses, setRegisteredCourses] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState('');
+
+  const timeSlots = [
+    { slot: 1, time: "09:00-10:30", start: "09:00", end: "10:30" },
+    { slot: 2, time: "10:30-12:00", start: "10:30", end: "12:00" },
+    { slot: 3, time: "11:00-12:30", start: "11:00", end: "12:30" },
+    { slot: 4, time: "13:00-14:30", start: "13:00", end: "14:30" },
+    { slot: 5, time: "14:00-15:30", start: "14:00", end: "15:30" },
+    { slot: 6, time: "15:30-17:00", start: "15:30", end: "17:00" },
+    { slot: 7, time: "16:00-17:30", start: "16:00", end: "17:30" },
+    { slot: 8, time: "17:00-18:30", start: "17:00", end: "18:30" }
+  ];
+
+  const days = ['월', '화', '수', '목', '금'];
+  const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+  const MAX_CREDITS = 21;
+
+  // 학기 시작일 (2024년 9월 2일 월요일로 설정)
+  const semesterStart = new Date(2024, 8, 2); // 월은 0부터 시작
+
+  const showMessage = (text, type) => {
+    setMessage(text);
+    setMessageType(type);
+    setTimeout(() => setMessage(''), 3000);
+  };
+
+  const timeToSlot = (time) => {
+    const timeSlot = timeSlots.find(slot => slot.start === time);
+    return timeSlot ? timeSlot.slot : null;
+  };
+
+  const checkTimeConflict = (newCourse) => {
+    for (let registeredCourse of registeredCourses) {
+      for (let newTime of newCourse.times) {
+        for (let regTime of registeredCourse.times) {
+          if (newTime.day === regTime.day) {
+            const newStart = newTime.startTime;
+            const newEnd = newTime.endTime;
+            const regStart = regTime.startTime;
+            const regEnd = regTime.endTime;
             
-            .search-filter {
-                flex-direction: column;
+            if ((newStart < regEnd && newEnd > regStart)) {
+              return true;
             }
-            
-            .course-details {
-                flex-direction: column;
-                gap: 4px;
-            }
-            
-            .modal-info {
-                grid-template-columns: 1fr;
-            }
+          }
         }
-    </style>
-</head>
-<body>
-    <header class="header">
-        <div class="container">
-            <h1>
-                <svg class="icon" viewBox="0 0 24 24">
-                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
-                    <path d="M6.5 2H20a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2H6.5a2.5 2.5 0 0 1-2.5-2.5C4 3.57 4.57 3 5.5 3S7 3.57 7 4.5"></path>
-                    <path d="M6.5 8H20a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2H6.5a2.5 2.5 0 0 1-2.5-2.5C4 9.57 4.57 9 5.5 9S7 9.57 7 10.5"></path>
-                </svg>
-                수강신청 시스템
-            </h1>
-        </div>
-    </header>
+      }
+    }
+    return false;
+  };
 
-    <div class="container">
-        <!-- Status Section -->
-        <div class="status-section">
-            <h2>
-                <svg class="icon" viewBox="0 0 24 24">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                </svg>
-                신청 현황
-            </h2>
-            <div class="status-grid">
-                <div class="status-card blue">
-                    <div class="number" id="courseCount">0</div>
-                    <div class="label">신청 강의 수</div>
-                </div>
-                <div class="status-card green">
-                    <div class="number" id="totalCredits">0</div>
-                    <div class="label">총 학점</div>
-                </div>
-                <div class="status-card purple">
-                    <div class="number" id="remainingCredits">18</div>
-                    <div class="label">남은 학점</div>
-                </div>
-            </div>
+  const registerCourse = (course) => {
+    if (registeredCourses.find(c => c.id === course.id)) {
+      showMessage('이미 신청한 강의입니다.', 'error');
+      return;
+    }
+
+    const totalCredits = registeredCourses.reduce((sum, c) => sum + c.credit, 0);
+    if (totalCredits + course.credit > MAX_CREDITS) {
+      showMessage(`학점 제한을 초과합니다. (최대 ${MAX_CREDITS}학점)`, 'error');
+      return;
+    }
+
+    if (checkTimeConflict(course)) {
+      showMessage('시간표가 겹치는 강의가 있습니다.', 'error');
+      return;
+    }
+
+    if (course.enrolled >= course.capacity) {
+      showMessage('정원이 마감된 강의입니다.', 'error');
+      return;
+    }
+
+    setRegisteredCourses([...registeredCourses, course]);
+    showMessage(`${course.name} 강의를 신청했습니다.`, 'success');
+  };
+
+  const cancelCourse = (courseId) => {
+    const course = registeredCourses.find(c => c.id === courseId);
+    setRegisteredCourses(registeredCourses.filter(c => c.id !== courseId));
+    showMessage(`${course.name} 강의를 취소했습니다.`, 'success');
+  };
+
+  const filteredCourses = courses.filter(course =>
+    course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    course.professor.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    course.department.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const totalCredits = registeredCourses.reduce((sum, course) => sum + course.credit, 0);
+
+  const getTimeTableCourse = (day, slot) => {
+    return registeredCourses.find(course => 
+      course.times.some(time => 
+        time.day === day && timeToSlot(time.startTime) === slot
+      )
+    );
+  };
+
+  // 달력 관련 함수들
+  const getDaysInMonth = (date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startDay = firstDay.getDay();
+
+    const days = [];
+    
+    // 이전 달의 빈 칸들
+    for (let i = 0; i < startDay; i++) {
+      days.push(null);
+    }
+    
+    // 현재 달의 날짜들
+    for (let i = 1; i <= daysInMonth; i++) {
+      days.push(new Date(year, month, i));
+    }
+    
+    return days;
+  };
+
+  const getCoursesForDate = (date) => {
+    if (!date) return [];
+    
+    const dayName = dayNames[date.getDay()];
+    return registeredCourses.filter(course => 
+      course.times.some(time => time.day === dayName)
+    );
+  };
+
+  const changeMonth = (direction) => {
+    setCurrentDate(prev => {
+      const newDate = new Date(prev);
+      newDate.setMonth(prev.getMonth() + direction);
+      return newDate;
+    });
+  };
+
+  const renderSearchTab = () => (
+    <div className="flex gap-4">
+      {/* Left Panel - Course List */}
+      <div className="w-1/2 space-y-4">
+        {/* Search */}
+        <div className="bg-white rounded-lg shadow p-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="강의명, 교수명, 학과를 검색하세요..."
+              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
         </div>
 
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Course Search and List -->
-            <div class="course-section">
-                <h2 class="section-title">
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <path d="m21 21-4.35-4.35"></path>
-                    </svg>
-                    강의 검색
-                </h2>
-                
-                <div class="search-filter">
-                    <div class="search-input">
-                        <svg class="icon" viewBox="0 0 24 24">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <path d="m21 21-4.35-4.35"></path>
-                        </svg>
-                        <input type="text" id="searchInput" placeholder="강의명, 강의코드, 교수명으로 검색">
-                    </div>
-                    <div class="filter-row">
-                        <svg class="icon" viewBox="0 0 24 24">
-                            <polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46"></polygon>
-                        </svg>
-                        <select id="departmentFilter">
-                            <option value="전체">전체</option>
-                            <option value="컴퓨터공학과">컴퓨터공학과</option>
-                            <option value="수학과">수학과</option>
-                            <option value="영어영문학과">영어영문학과</option>
-                            <option value="물리학과">물리학과</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="course-list" id="courseList">
-                    <!-- Courses will be populated here -->
-                </div>
-            </div>
-
-            <!-- Registered Courses -->
-            <div class="registered-courses">
-                <h2 class="section-title">신청한 강의</h2>
-                <div class="registered-list" id="registeredList">
-                    <div class="empty-state">
-                        신청한 강의가 없습니다.
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal -->
-    <div class="modal" id="courseModal">
-        <div class="modal-content">
-            <div class="modal-header">
+        {/* Course List */}
+        <div className="space-y-2 max-h-[70vh] overflow-y-auto">
+          {filteredCourses.map(course => (
+            <div key={course.id} className="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow">
+              <div className="flex justify-between items-start mb-2">
                 <div>
-                    <div class="course-badges">
-                        <span class="badge" id="modalCode"></span>
-                        <span class="department-tag" id="modalDepartment"></span>
-                    </div>
-                    <h2 id="modalTitle"></h2>
+                  <h3 className="font-semibold text-lg">{course.name}</h3>
+                  <p className="text-sm text-gray-600">{course.department}</p>
                 </div>
-                <button class="modal-close" onclick="closeModal()">&times;</button>
+                <div className="text-right">
+                  <span className="text-sm font-medium">{course.credit}학점</span>
+                  <div className={`text-xs px-2 py-1 rounded ${
+                    course.enrolled >= course.capacity 
+                      ? 'bg-red-100 text-red-800' 
+                      : 'bg-green-100 text-green-800'
+                  }`}>
+                    {course.enrolled}/{course.capacity}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-1 text-sm text-gray-600 mb-3">
+                <div className="flex items-center gap-2">
+                  <User className="w-4 h-4" />
+                  <span>{course.professor}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4" />
+                  <span>{course.times.map(t => `${t.day} ${t.startTime}-${t.endTime}`).join(', ')}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-4 h-4" />
+                  <span>{course.room}</span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => registerCourse(course)}
+                disabled={registeredCourses.find(c => c.id === course.id) || course.enrolled >= course.capacity}
+                className={`w-full py-2 px-4 rounded-lg transition-colors ${
+                  registeredCourses.find(c => c.id === course.id)
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : course.enrolled >= course.capacity
+                    ? 'bg-red-300 text-red-800 cursor-not-allowed'
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                }`}
+              >
+                {registeredCourses.find(c => c.id === course.id) 
+                  ? '신청완료' 
+                  : course.enrolled >= course.capacity 
+                  ? '정원마감' 
+                  : '수강신청'}
+              </button>
             </div>
-            
-            <div class="modal-info">
-                <div class="info-item">
-                    <div class="info-label">담당교수</div>
-                    <div class="info-value" id="modalProfessor"></div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">학점</div>
-                    <div class="info-value" id="modalCredits"></div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">시간</div>
-                    <div class="info-value" id="modalTime"></div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">수강인원</div>
-                    <div class="info-value" id="modalCapacity"></div>
-                </div>
-            </div>
-            
-            <div class="modal-description">
-                <div class="info-item">
-                    <div class="info-label">선수과목</div>
-                    <div class="info-value" id="modalPrerequisites"></div>
-                </div>
-                <div class="info-item" style="margin-top: 16px;">
-                    <div class="info-label">강의 설명</div>
-                    <div class="info-value" id="modalDescription"></div>
-                </div>
-            </div>
-            
-            <div class="modal-actions">
-                <button class="btn btn-primary" id="modalRegisterBtn" onclick="registerFromModal()">
-                    수강신청
-                </button>
-            </div>
+          ))}
         </div>
-    </div>
+      </div>
 
-    <script>
-        // Sample data
-        const courses = [
-            {
-                id: 1,
-                code: 'CS101',
-                name: '프로그래밍 기초',
-                professor: '김교수',
-                credits: 3,
-                time: '월/수 09:00-10:30',
-                capacity: 30,
-                enrolled: 25,
-                department: '컴퓨터공학과',
-                description: '프로그래밍의 기본 개념과 알고리즘을 학습합니다.',
-                prerequisites: '없음'
-            },
-            {
-                id: 2,
-                code: 'MATH201',
-                name: '미적분학',
-                professor: '이교수',
-                credits: 3,
-                time: '화/목 10:00-11:30',
-                capacity: 40,
-                enrolled: 32,
-                department: '수학과',
-                description: '함수의 극한, 미분, 적분의 기본 이론을 다룹니다.',
-                prerequisites: '고등수학'
-            },
-            {
-                id: 3,
-                code: 'ENG102',
-                name: '영어회화',
-                professor: '박교수',
-                credits: 2,
-                time: '금 14:00-17:00',
-                capacity: 20,
-                enrolled: 20,
-                department: '영어영문학과',
-                description: '실용적인 영어 회화 능력을 기릅니다.',
-                prerequisites: '영어기초'
-            },
-            {
-                id: 4,
-                code: 'CS201',
-                name: '자료구조',
-                professor: '정교수',
-                credits: 3,
-                time: '월/수 14:00-15:30',
-                capacity: 35,
-                enrolled: 28,
-                department: '컴퓨터공학과',
-                description: '배열, 연결리스트, 스택, 큐 등의 자료구조를 학습합니다.',
-                prerequisites: '프로그래밍 기초'
-            },
-            {
-                id: 5,
-                code: 'PHYS101',
-                name: '일반물리학',
-                professor: '최교수',
-                credits: 3,
-                time: '화/목 13:00-14:30',
-                capacity: 45,
-                enrolled: 38,
-                department: '물리학과',
-                description: '역학, 열역학, 전자기학의 기본 원리를 다룹니다.',
-                prerequisites: '고등물리'
-            }
-        ];
+      {/* Right Panel */}
+      <div className="w-1/2 space-y-4">
+        {/* Credits Summary */}
+        <div className="bg-white rounded-lg shadow p-4">
+          <h2 className="font-semibold text-lg mb-2 flex items-center gap-2">
+            <BookOpen className="w-5 h-5" />
+            학점 현황
+          </h2>
+          <div className="flex justify-between items-center">
+            <span>총 신청 학점</span>
+            <span className={`font-bold ${totalCredits > MAX_CREDITS ? 'text-red-600' : 'text-blue-600'}`}>
+              {totalCredits}/{MAX_CREDITS}
+            </span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+            <div 
+              className={`h-2 rounded-full ${totalCredits > MAX_CREDITS ? 'bg-red-500' : 'bg-blue-500'}`}
+              style={{ width: `${Math.min((totalCredits / MAX_CREDITS) * 100, 100)}%` }}
+            />
+          </div>
+        </div>
 
-        let registeredCourses = [];
-        let selectedCourse = null;
-
-        // Initialize app
-        document.addEventListener('DOMContentLoaded', function() {
-            renderCourses();
-            updateStatus();
-            
-            // Event listeners
-            document.getElementById('searchInput').addEventListener('input', filterCourses);
-            document.getElementById('departmentFilter').addEventListener('change', filterCourses);
-        });
-
-        function renderCourses() {
-            const courseList = document.getElementById('courseList');
-            const filteredCourses = getFilteredCourses();
-            
-            courseList.innerHTML = filteredCourses.map(course => `
-                <div class="course-item">
-                    <div class="course-header">
-                        <div class="course-info">
-                            <div class="course-badges">
-                                <span class="badge">${course.code}</span>
-                                <span class="department-tag">${course.department}</span>
-                            </div>
-                            <h3 class="course-title">${course.name}</h3>
-                            <div class="course-details">
-                                <span>👨‍🏫 ${course.professor}</span>
-                                <span>🕒 ${course.time}</span>
-                                <span>📚 ${course.credits}학점</span>
-                            </div>
-                            <div class="course-capacity">
-                                수강인원: ${course.enrolled}/${course.capacity}
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: ${(course.enrolled / course.capacity) * 100}%"></div>
-                            </div>
-                        </div>
-                        <div class="course-actions">
-                            <button class="btn btn-secondary" onclick="openModal(${course.id})">
-                                상세정보
-                            </button>
-                            <button class="btn btn-primary" onclick="registerCourse(${course.id})" 
-                                    ${course.enrolled >= course.capacity || isRegistered(course.id) ? 'disabled' : ''}>
-                                ${isRegistered(course.id) ? '신청됨' : course.enrolled >= course.capacity ? '마감' : '신청'}
-                            </button>
-                        </div>
+        {/* Registered Courses */}
+        <div className="bg-white rounded-lg shadow p-4">
+          <h2 className="font-semibold text-lg mb-4">신청한 강의</h2>
+          {registeredCourses.length === 0 ? (
+            <p className="text-gray-500 text-center py-4">신청한 강의가 없습니다.</p>
+          ) : (
+            <div className="space-y-3">
+              {registeredCourses.map(course => (
+                <div key={course.id} className="border border-gray-200 rounded-lg p-3">
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <div className="font-semibold">{course.name}</div>
+                      <div className="text-sm text-gray-600">{course.department}</div>
                     </div>
-                </div>
-            `).join('');
-        }
-
-        function getFilteredCourses() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const selectedDepartment = document.getElementById('departmentFilter').value;
-            
-            return courses.filter(course => {
-                const matchesSearch = course.name.toLowerCase().includes(searchTerm) ||
-                                    course.code.toLowerCase().includes(searchTerm) ||
-                                    course.professor.toLowerCase().includes(searchTerm);
-                const matchesDepartment = selectedDepartment === '전체' || course.department === selectedDepartment;
-                return matchesSearch && matchesDepartment;
-            });
-        }
-
-        function filterCourses() {
-            renderCourses();
-        }
-
-        function isRegistered(courseId) {
-            return registeredCourses.some(course => course.id === courseId);
-        }
-
-        function registerCourse(courseId) {
-            const course = courses.find(c => c.id === courseId);
-            
-            if (isRegistered(courseId)) {
-                alert('이미 신청한 강의입니다.');
-                return;
-            }
-            
-            if (course.enrolled >= course.capacity) {
-                alert('수강인원이 마감되었습니다.');
-                return;
-            }
-
-            const totalCredits = registeredCourses.reduce((sum, c) => sum + c.credits, 0);
-            if (totalCredits + course.credits > 18) {
-                alert('최대 18학점까지만 신청할 수 있습니다.');
-                return;
-            }
-
-            const timeConflict = registeredCourses.some(registered => registered.time === course.time);
-            if (timeConflict) {
-                alert('시간이 겹치는 강의가 있습니다.');
-                return;
-            }
-
-            registeredCourses.push(course);
-            course.enrolled++;
-            
-            renderCourses();
-            renderRegisteredCourses();
-            updateStatus();
-            closeModal();
-            alert('수강신청이 완료되었습니다!');
-        }
-
-        function cancelCourse(courseId) {
-            const course = courses.find(c => c.id === courseId);
-            registeredCourses = registeredCourses.filter(c => c.id !== courseId);
-            course.enrolled--;
-            
-            renderCourses();
-            renderRegisteredCourses();
-            updateStatus();
-            alert('수강신청이 취소되었습니다.');
-        }
-
-        function renderRegisteredCourses() {
-            const registeredList = document.getElementById('registeredList');
-            
-            if (registeredCourses.length === 0) {
-                registeredList.innerHTML = '<div class="empty-state">신청한 강의가 없습니다.</div>';
-                return;
-            }
-            
-            registeredList.innerHTML = registeredCourses.map(course => `
-                <div class="registered-item">
-                    <button class="remove-btn" onclick="cancelCourse(${course.id})">
-                        <svg class="icon" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
+                    <button
+                      onClick={() => cancelCourse(course.id)}
+                      className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors text-sm"
+                    >
+                      취소
                     </button>
-                    <div class="course-badges">
-                        <span class="badge" style="background: #dcfce7; color: #15803d;">${course.code}</span>
+                  </div>
+                  <div className="text-sm text-gray-600 space-y-1">
+                    <div className="flex items-center gap-2">
+                      <User className="w-3 h-3" />
+                      <span>{course.professor}</span>
                     </div>
-                    <h4>${course.name}</h4>
-                    <div class="details">
-                        <span>${course.professor}</span>
-                        <span>${course.time}</span>
-                        <span>${course.credits}학점</span>
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-3 h-3" />
+                      <span>{course.times.map(t => `${t.day} ${t.startTime}-${t.endTime}`).join(', ')}</span>
                     </div>
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-3 h-3" />
+                      <span>{course.room}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <BookOpen className="w-3 h-3" />
+                      <span>{course.credit}학점</span>
+                    </div>
+                  </div>
                 </div>
-            `).join('');
-        }
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 
-        function updateStatus() {
-            const courseCount = registeredCourses.length;
-            const totalCredits = registeredCourses.reduce((sum, course) => sum + course.credits, 0);
-            const remainingCredits = 18 - totalCredits;
-            
-            document.getElementById('courseCount').textContent = courseCount;
-            document.getElementById('totalCredits').textContent = totalCredits;
-            document.getElementById('remainingCredits').textContent = remainingCredits;
-        }
+  const renderTimeTableTab = () => (
+    <div className="space-y-4">
+      {/* Credits Summary */}
+      <div className="bg-white rounded-lg shadow p-4">
+        <h2 className="font-semibold text-lg mb-2 flex items-center gap-2">
+          <BookOpen className="w-5 h-5" />
+          학점 현황
+        </h2>
+        <div className="flex justify-between items-center">
+          <span>총 신청 학점</span>
+          <span className={`font-bold ${totalCredits > MAX_CREDITS ? 'text-red-600' : 'text-blue-600'}`}>
+            {totalCredits}/{MAX_CREDITS}
+          </span>
+        </div>
+        <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+          <div 
+            className={`h-2 rounded-full ${totalCredits > MAX_CREDITS ? 'bg-red-500' : 'bg-blue-500'}`}
+            style={{ width: `${Math.min((totalCredits / MAX_CREDITS) * 100, 100)}%` }}
+          />
+        </div>
+      </div>
 
-        function openModal(courseId) {
-            selectedCourse = courses.find(c => c.id === courseId);
-            const modal = document.getElementById('courseModal');
+      {/* Time Table */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="font-semibold text-xl mb-6 flex items-center gap-2">
+          <Grid3X3 className="w-6 h-6" />
+          나의 시간표
+        </h2>
+        <div className="grid grid-cols-6 gap-2">
+          <div className="font-medium text-center p-3"></div>
+          {days.map(day => (
+            <div key={day} className="font-medium text-center p-3 bg-gray-100 rounded">{day}</div>
+          ))}
+          
+          {timeSlots.map(slot => (
+            <React.Fragment key={slot.slot}>
+              <div className="text-sm text-gray-600 p-3 bg-gray-50 text-center rounded">
+                <div className="font-medium">{slot.slot}교시</div>
+                <div className="text-xs">{slot.time}</div>
+              </div>
+              {days.map(day => {
+                const course = getTimeTableCourse(day, slot.slot);
+                return (
+                  <div key={`${day}-${slot.slot}`} className="border-2 border-gray-200 min-h-[80px] p-2 rounded">
+                    {course && (
+                      <div className={`${course.color} text-white text-sm p-2 rounded h-full flex flex-col justify-center`}>
+                        <div className="font-semibold text-center mb-1">{course.name}</div>
+                        <div className="text-center text-xs opacity-90">{course.professor}</div>
+                        <div className="text-center text-xs opacity-90">{course.room}</div>
+                        <div className="text-center text-xs opacity-90">{course.credit}학점</div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
+
+      {/* Course List */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="font-semibold text-xl mb-4">수강 과목 목록</h2>
+        {registeredCourses.length === 0 ? (
+          <p className="text-gray-500 text-center py-8">신청한 강의가 없습니다.</p>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2">
+            {registeredCourses.map(course => (
+              <div key={course.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <h3 className="font-semibold text-lg">{course.name}</h3>
+                    <p className="text-sm text-gray-600">{course.department}</p>
+                  </div>
+                  <span className={`px-2 py-1 rounded text-sm font-medium text-white ${course.color}`}>
+                    {course.credit}학점
+                  </span>
+                </div>
+                
+                <div className="space-y-2 text-sm text-gray-600">
+                  <div className="flex items-center gap-2">
+                    <User className="w-4 h-4" />
+                    <span>{course.professor}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4" />
+                    <span>{course.times.map(t => `${t.day} ${t.startTime}-${t.endTime}`).join(', ')}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4" />
+                    <span>{course.room}</span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => cancelCourse(course.id)}
+                  className="w-full mt-3 py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                >
+                  수강 취소
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  const renderCalendarTab = () => {
+    const calendarDays = getDaysInMonth(currentDate);
+    
+    return (
+      <div className="space-y-4">
+        {/* Calendar Header */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="font-semibold text-xl flex items-center gap-2">
+              <Calendar className="w-6 h-6" />
+              수강 달력
+            </h2>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => changeMonth(-1)}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <h3 className="text-lg font-medium">
+                {currentDate.getFullYear()}년 {currentDate.getMonth() + 1}월
+              </h3>
+              <button
+                onClick={() => changeMonth(1)}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Calendar Grid */}
+          <div className="grid grid-cols-7 gap-1">
+            {/* Day Headers */}
+            {dayNames.map(day => (
+              <div key={day} className="p-3 text-center font-medium text-gray-600 bg-gray-50 rounded">
+                {day}
+              </div>
+            ))}
             
-            document.getElementById('modalCode').textContent = selectedCourse.code;
-            document.getElementById('modalDepartment').textContent = selectedCourse.department;
-            document.getElementById('modalTitle').textContent = selectedCourse.name;
-            document.getElementById('modalProfessor').textContent = selectedCourse.professor;
-            document.getElementById('modalCredits').textContent = selectedCourse.credits + '학점';
-            document.getElementById('modalTime').textContent = selectedCourse.time;
-            document.getElementById('modalCapacity').textContent = `${selectedCourse.enrolled}/${selectedCourse.capacity}`;
-            document.getElementById('modalPrerequisites').textContent = selectedCourse.prerequisites;
-            document.getElementById('modalDescription').textContent = selectedCourse.description;
+            {/* Calendar Days */}
+            {calendarDays.map((date, index) => {
+              const courses = getCoursesForDate(date);
+              const isToday = date && date.toDateString() === new Date().toDateString();
+              
+              return (
+                <div 
+                  key={index} 
+                  className={`min-h-[100px] p-2 border border-gray-200 rounded ${
+                    date ? 'bg-white hover:bg-gray-50' : 'bg-gray-100'
+                  } ${isToday ? 'ring-2 ring-blue-500' : ''}`}
+                >
+                  {date && (
+                    <>
+                      <div className={`text-sm font-medium mb-1 ${
+                        isToday ? 'text-blue-600' : 'text-gray-700'
+                      }`}>
+                        {date.getDate()}
+                      </div>
+                      <div className="space-y-1">
+                        {courses.map(course => (
+                          <div key={`${course.id}-${date.getDate()}`} className="text-xs">
+                            {course.times.filter(time => time.day === dayNames[date.getDay()]).map((time, timeIndex) => (
+                              <div 
+                                key={timeIndex}
+                                className={`${course.color} text-white px-1 py-0.5 rounded text-xs truncate`}
+                                title={`${course.name} (${time.startTime}-${time.endTime})`}
+                              >
+                                {time.startTime} {course.name}
+                              </div>
+                            ))}
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Today's Schedule */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="font-semibold text-lg mb-4">오늘의 수업 ({new Date().getMonth() + 1}월 {new Date().getDate()}일)</h3>
+          {(() => {
+            const today = new Date();
+            const todayCourses = getCoursesForDate(today);
             
-            const registerBtn = document.getElementById('modalRegisterBtn');
-            if (isRegistered(courseId)) {
-                registerBtn.textContent = '이미 신청함';
-                registerBtn.disabled = true;
-            } else if (selectedCourse.enrolled >= selectedCourse.capacity) {
-                registerBtn.textContent = '마감';
-                registerBtn.disabled = true;
-            } else {
-                registerBtn.textContent = '수강신청';
-                registerBtn.disabled = false;
+            if (todayCourses.length === 0) {
+              return <p className="text-gray-500 py-4">오늘은 수업이 없습니다.</p>;
             }
             
-            modal.classList.add('active');
-        }
+            return (
+              <div className="space-y-3">
+                {todayCourses.map(course => (
+                  <div key={course.id}>
+                    {course.times.filter(time => time.day === dayNames[today.getDay()]).map((time, timeIndex) => (
+                      <div key={timeIndex} className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
+                        <div className={`w-4 h-4 rounded-full ${course.color}`}></div>
+                        <div className="flex-1">
+                          <div className="font-medium">{course.name}</div>
+                          <div className="text-sm text-gray-600">{course.professor} • {course.room}</div>
+                        </div>
+                        <div className="text-sm font-medium text-gray-700">
+                          {time.startTime} - {time.endTime}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
+        </div>
 
-        function closeModal() {
-            document.getElementById('courseModal').classList.remove('active');
-        }
+        {/* Weekly Overview */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="font-semibold text-lg mb-4">이번 주 수업 개요</h3>
+          <div className="grid grid-cols-5 gap-4">
+            {days.map(day => {
+              const dayIndex = days.indexOf(day) + 1; // 월=1, 화=2, ...
+              const today = new Date();
+              const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay() + dayIndex));
+              const dayCourses = getCoursesForDate(startOfWeek);
+              
+              return (
+                <div key={day} className="text-center">
+                  <div className="font-medium text-gray-700 mb-2">{day}요일</div>
+                  <div className="text-sm text-gray-500 mb-2">
+                    {startOfWeek.getMonth() + 1}/{startOfWeek.getDate()}
+                  </div>
+                  <div className="space-y-1">
+                    {dayCourses.length === 0 ? (
+                      <div className="text-xs text-gray-400">수업 없음</div>
+                    ) : (
+                      dayCourses.map(course => (
+                        <div key={course.id}>
+                          {course.times.filter(time => time.day === day).map((time, timeIndex) => (
+                            <div 
+                              key={timeIndex}
+                              className={`${course.color} text-white text-xs p-1 rounded mb-1`}
+                              title={`${course.name} (${time.startTime}-${time.endTime})`}
+                            >
+                              {course.name}
+                            </div>
+                          ))}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  };
 
-        function registerFromModal() {
-            if (selectedCourse) {
-                registerCourse(selectedCourse.id);
-            }
-        }
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-blue-600 text-white p-4">
+        <h1 className="text-2xl font-bold text-center">수강신청 시스템</h1>
+      </div>
 
-        // Close modal when clicking outside
-        document.getElementById('courseModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeModal();
-            }
-        });
-    </script>
-</body>
-</html>
+      {/* Navigation Tabs */}
+      <div className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex space-x-8">
+            <button
+              onClick={() => setActiveTab('search')}
+              className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${
+                activeTab === 'search'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <Search className="w-4 h-4" />
+                강의 검색
+              </div>
+            </button>
+            <button
+              onClick={() => setActiveTab('timetable')}
+              className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${
+                activeTab === 'timetable'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <Grid3X3 className="w-4 h-4" />
+                나의 시간표
+              </div>
+            </button>
+            <button
+              onClick={() => setActiveTab('calendar')}
+              className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${
+                activeTab === 'calendar'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4" />
+                수강 달력
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Message */}
+      {message && (
+        <div className={`fixed top-20 right-4 px-4 py-2 rounded-lg shadow-lg z-50 flex items-center gap-2 ${
+          messageType === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+        }`}>
+          {messageType === 'success' ? <CheckCircle className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+          {message}
+        </div>
+      )}
+
+      {/* Content */}
+      <div className="max-w-7xl mx-auto p-4">
+        {activeTab === 'search' && renderSearchTab()}
+        {activeTab === 'timetable' && renderTimeTableTab()}
+        {activeTab === 'calendar' && renderCalendarTab()}
+      </div>
+    </div>
+  );
+};
+
+export default CourseRegistrationApp;
